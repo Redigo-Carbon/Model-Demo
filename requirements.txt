@@ -1,0 +1,38 @@
+# basics
+pandas~=1.5.3
+numpy
+
+# maths
+scipy
+scikit-learn~=1.2.1
+scikit-optimize
+
+# ml
+lightgbm
+xgboost
+
+# viz
+seaborn
+matplotlib
+
+# other tools
+tqdm
+
+# jupyter 
+jupyter
+jupyterlab
+ipython
+nb_conda_kernels
+
+# code formatting
+jupyterlab_code_formatter
+isort
+black
+
+# project management
+cookiecutter
+python-dotenv
+
+# presentation
+streamlit~=1.20.0
+joblib~=1.2.0
