@@ -9,6 +9,7 @@ scikit-optimize
 
 # ml
 lightgbm
+shap
 
 # viz
 seaborn
@@ -17,3 +18,4 @@ matplotlib
 # presentation
 streamlit~=1.20.0
 joblib~=1.2.0
+
