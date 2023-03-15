@@ -1,5 +1,4 @@
 import time
-
 import shap
 import streamlit as st
 import joblib
@@ -7,6 +6,8 @@ import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+from htbuilder import HtmlElement, div, hr, p, img, styles
+from htbuilder.units import percent, px
 
 model_file = open("model/best_model.pkl", "rb")
 pipe = joblib.load(model_file)
@@ -15,9 +16,71 @@ preprocessing = pipe.steps[0][-1]
 explainer = shap.TreeExplainer(model)
 
 
+# footer source: https://discuss.streamlit.io/t/st-footer/6447 chris_klose
+def image(src_as_string, **style):
+    return img(src=src_as_string, style=styles(**style))
+
+
+def footer_layout(*args):
+    style = """
+        <style>
+          # MainMenu {visibility: hidden;}
+          footer {visibility: hidden;}
+         .stApp { bottom: 105px; }
+        </style>
+        """
+
+    style_div = styles(
+        position="fixed",
+        left=0,
+        bottom=0,
+        margin=px(0, 0, 0, 0),
+        width=percent(100),
+        color="black",
+        text_align="center",
+        height="auto",
+        opacity=1
+    )
+
+    style_hr = styles(
+        display="block",
+        margin=px(8, 8, "auto", "auto"),
+        border_style="inset",
+        border_width=px(2)
+    )
+
+    body = p()
+    foot = div(
+        style=style_div
+    )(
+        hr(
+            style=style_hr
+        ),
+        body
+    )
+
+    st.markdown(style, unsafe_allow_html=True)
+
+    for arg in args:
+        if isinstance(arg, str):
+            body(arg)
+
+        elif isinstance(arg, HtmlElement):
+            body(arg)
+
+    st.markdown(str(foot), unsafe_allow_html=True)
+
+
 def main():
     st.image('images/img.png')
     st.markdown("<h2 style='text-align: center;'>GHG Emission ML Prediction Demo</h2>", unsafe_allow_html=True)
+
+    footer_layout(
+        "2023 Mateusz Dorobek | Redigo Carbon",
+        image(
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAALVBMVEVHcEwQnyEQnyEQnyERniIQniIQniEQnyERniIRnyEQnyEQniEQniEQniIQnyItIrHJAAAAD3RSTlMAH1yFm7zUMf8JcfOr5EKAEEw+AAAArElEQVR4Aa3IMQgBYRiA4ffA/XeyK4uyl0Gyl53NeGVRFvsE4ctF9lLKIvtgNMm+D0b7PvDLd/xWnvHhv7xKs8ubXxeRFolgVztKjCMtC1SAdZmjNoSHLcUhqo+RGSaJVPwIwUQaeRtjzEnjFmPtqxqdZ3gy0BAbQWPJi/8IU6a30ghtjDBVjYwNwUNlnxGRyNmYbUkUZIrPBzPBdV7jCCNcJb60+XLCFVz50R35gCavIGP1RgAAAABJRU5ErkJggg==',
+            width=px(25), height=px(25))
+    )
 
     choice = np.array([1, 2, 3, 5])
     full_choice = np.concatenate([choice * 10 ** i for i in range(0, 9)]).astype(int)
@@ -38,10 +101,10 @@ def main():
         with st.spinner('ML model calculation...'):
             time.sleep(2)
             input_data = pd.DataFrame([{
-                    'num_employees': num_employees,
-                    'buildings': buildings,
-                    'vehicles': vehicles
-                }])
+                'num_employees': num_employees,
+                'buildings': buildings,
+                'vehicles': vehicles
+            }])
 
             prediction = pipe.predict(input_data)[0]
             col5.success(
